@@ -6,45 +6,86 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="/bootstrap/dist/css/bootstrap.min.css">
 </head>
-<body>
+<body style="margin-top: 10px;">
     <div id="app" class="container">
-        <ul id="messages" class="list-group">
-            <!--chat message history-->
-            <li v-for="msg in messagesHist" class="list-group-item">{{msg}}</li>
-        </ul>
-        <form action="" name="messageForm" v-on:submit.prevent="sendMessage(message)">
-            <div class="row">
-                <div class="input-group">
-                    <input class="form-control" type="text" autocomplete="off" v-model="message" />
-                    <div class="input-group-btn">
-                        <button class="btn btn-primary" type="button" @click="sendMessage(message)">Send</button>
+
+        <!--Only show before user logged in-->
+        <div class="row" v-show="!userLoggedIn">
+            <div class="col-md-6 col-md-offset-3">
+                <form action="" name="loginForm" v-on:submit.prevent="">
+                    <div class="row">
+                        <div class="input-group">
+                            <input class="form-control" type="text" autocomplete="off" v-model="userName" />
+                            <div class="input-group-btn">
+                                <button class="btn btn-primary" type="button" @click="login(userName)">Login</button>
+                            </div>
+                        </div>
                     </div>
-                </div>
+                </form>
             </div>
-        </form>
+        </div>
+
+        <div class="row" v-show="userLoggedIn">
+
+            <!--online user list-->
+            <div class="col-md-3">
+                <ul class="list-group">
+                    <li class="list-group-item active"><span class="glyphicon glyphicon-user"></span> Online Users</li>
+
+                    <li class="list-group-item" v-for="user in userList">{{user}}</li>
+                </ul>
+            </div>
+
+            <!--chat history-->
+            <div class="col-md-9">
+                <ul id="messages" class="list-group">
+                    <!--chat message history-->
+                    <li v-for="data in messagesHist" class="list-group-item"><span style="font-weight: bold;">{{data.userName}}</span> : {{data.message}}</li>
+                </ul>
+                <form action="" name="messageForm" v-on:submit.prevent="sendMessage(message)">
+                    <div class="input-group">
+                        <input class="form-control" type="text" autocomplete="off" v-model="message" />
+                        <div class="input-group-btn">
+                            <button class="btn btn-primary" type="button" @click="sendMessage(message)">Send</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+        </div>
+
     </div>
     <script src="/socket.io/socket.io.js"></script>
     <script src="/vue/dist/vue.js"></script>
     <script>
         var socket = io();
 
-        var messageHist = [];
-
         var vue = new Vue({
             el:'#app',
             data: {
+                userName: "",
+                userList:[],
+                userLoggedIn: false,
                 message: "",
                 messagesHist:[]
             },
             methods: {
+                login: function(userName){
+                    socket.emit('join', userName);
+                    this.userLoggedIn = true;
+                },
                 sendMessage: function(message){
                     socket.emit('message', message);
                     this.message = "";
                     return false;
                 },
                 initSocket: function(){
-                    socket.on('message', function(message){
-                        this.messagesHist.push(message);
+                    socket.on('message', function(data){
+                        this.messagesHist.push(data);
+                    }.bind(this));
+
+                    socket.on('refreshUserList', function(users){
+                        this.userList = users;
                     }.bind(this));
                 }
             }
