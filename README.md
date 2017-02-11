@@ -35,9 +35,9 @@ Then you can access the chat room here: <http://localhost:3000>
 
 ### Version 2.0
 
-* Add simple login functionalities. User may input their nickname before entering the chat room. and use may see who is currently online at left hand side user list.
+* Add simple login functionalities. User may input their nickname before entering the chat room. And user may see who is currently online at left hand side user list.
 
-* the message has the prefix to indicate by who sent the message
+* Message now has the prefix to indicate by who it is sent
 
 ### Version 3.0 (TODO)
 
