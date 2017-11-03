@@ -2,6 +2,8 @@
 
 This project implemented a real-time chat application with socket.io.
 
+![Screenshot](https://user-images.githubusercontent.com/3967446/32359950-e2d3a24e-c027-11e7-87ef-643d9e63b686.png)
+
 ## Tech Stack
 
 Server:
